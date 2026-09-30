@@ -1,0 +1,16 @@
+{
+  "name": "nexmora-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Centralized Employee & Customer Management System",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:admin": "npm run dev --workspace=apps/admin-desktop",
+    "dev:portal": "npm run dev --workspace=apps/employee-portal",
+    "build:admin": "npm run build --workspace=apps/admin-desktop",
+    "build:portal": "npm run build --workspace=apps/employee-portal"
+  }
+}
