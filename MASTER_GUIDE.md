@@ -77,9 +77,17 @@ The Admin app is designed to run natively on Windows/Mac. You will need to wrap 
 3. Run `npx electron-builder` to generate the installer files.
 4. Distribute the `.exe` to your Admins.
 
-### 2. Deploying the Employee Portal (Web)
-The Employee portal is a standard Vite React app that can be hosted anywhere.
-1. Connect your GitHub repository to **Vercel**, **Netlify**, or **Cloudflare Pages**.
-2. Set the Root Directory to `apps/employee-portal`.
-3. Add your `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to the deployment Environment Variables.
-4. Deploy! Your employees will access this via a standard URL (e.g., `portal.nexmora.com`).
+### 2. Deploying the Web Apps (Vercel)
+Both apps are static Vite builds, so each one is deployed as its own Vercel project from this repo. Netlify and Cloudflare Pages work too, and each app ships a `public/_redirects` file for them.
+
+| Setting | Employee Portal | Admin (web) |
+|---|---|---|
+| Root Directory | `apps/employee-portal` | `apps/admin-desktop` |
+| Install Command | `cd ../.. && npm ci` | `cd ../.. && npm ci` |
+| Build Command | `cd ../.. && npm run build:portal` | `cd ../.. && npm run build:admin` |
+| Output Directory | `dist` | `dist` |
+
+1. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to each project's Environment Variables. `.env` files are not committed; copy `.env.example`.
+2. Each app's `vercel.json` rewrites all paths to `index.html` so that client-side routes (e.g. `/dashboard`) still work on refresh.
+3. Deploy the edge function: `npx supabase functions deploy create-employee`.
+4. In Supabase -> Authentication -> URL Configuration, add both deployed URLs (e.g. `portal.nexmora.com`, `admin.nexmora.com`).
