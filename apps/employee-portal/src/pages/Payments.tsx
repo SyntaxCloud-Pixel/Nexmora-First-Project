@@ -34,12 +34,6 @@ export const Payments: React.FC = () => {
     }
   };
 
-  const getNextStatus = (currentStatus: string) => {
-    const statuses = ['PENDING', 'COMPLETED', 'REJECTED'];
-    const currentIndex = statuses.indexOf(currentStatus);
-    return statuses[(currentIndex + 1) % statuses.length];
-  };
-
   useEffect(() => {
     fetchPayments();
 
