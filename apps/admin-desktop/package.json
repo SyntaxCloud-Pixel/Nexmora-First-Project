@@ -1,19 +1,22 @@
 {
   "name": "admin-desktop",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Nexmora Admin Desktop Application",
   "author": "Nexmora",
   "type": "module",
   "main": "electron/main.js",
- "scripts": {
-  "dev": "vite",
-  "build": "tsc -b && vite build",
-  "lint": "oxlint",
-  "preview": "vite preview",
-  "electron": "electron .",
-  "package:win": "npm run build && electron-builder --win"
-},
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "electron": "electron .",
+    "package:win": "npm run build && electron-builder --win",
+    "package:mac": "npm run build && electron-builder --mac",
+    "package:linux": "npm run build && electron-builder --linux",
+    "package:all": "npm run build && electron-builder -mwl"
+  },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -39,19 +42,42 @@
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
   },
-"build": {
-  "appId": "com.nexmora.admin",
-  "productName": "Nexmora Admin",
-  "directories": {
-    "output": "release"
-  },
-  "files": [
-    "dist/**/*",
-    "electron/**/*",
-    "package.json"
-  ],
-  "win": {
-    "target": "nsis"
+  "build": {
+    "appId": "com.nexmora.admin",
+    "productName": "Nexmora Admin",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icon.icns",
+      "category": "public.app-category.business"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "build/icon.png",
+      "category": "Office"
+    }
   }
-}
 }
