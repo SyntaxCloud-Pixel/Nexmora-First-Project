@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from 'supabase-client';
-import { Search, UserPlus, MoreHorizontal } from 'lucide-react';
+import { Search, UserPlus } from 'lucide-react';
 import { AddCustomerModal } from '../components/AddCustomerModal';
 
 export const Customers: React.FC = () => {
