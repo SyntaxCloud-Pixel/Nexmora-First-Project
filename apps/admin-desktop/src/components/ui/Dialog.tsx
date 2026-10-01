@@ -16,7 +16,7 @@ const Dialog = ({ open, onOpenChange, children }: DialogProps) => {
         className="fixed inset-0 bg-black/50" 
         onClick={() => onOpenChange?.(false)}
       />
-      <div className="relative z-50 w-full max-w-lg rounded-lg border bg-background shadow-lg">
+      <div className="relative z-50 w-full max-w-lg rounded-lg border bg-white shadow-lg">
         {children}
       </div>
     </div>
@@ -34,7 +34,7 @@ const DialogTitle = ({ className, ...props }: React.HTMLAttributes<HTMLHeadingEl
 DialogTitle.displayName = "DialogTitle"
 
 const DialogDescription = ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-  <p className={cn("text-sm text-muted-foreground", className)} {...props} />
+  <p className={cn("text-sm text-gray-500", className)} {...props} />
 )
 DialogDescription.displayName = "DialogDescription"
 

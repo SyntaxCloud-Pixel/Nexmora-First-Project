@@ -2,13 +2,18 @@
   "name": "admin-desktop",
   "private": true,
   "version": "0.0.0",
+  "description": "Nexmora Admin Desktop Application",
+  "author": "Nexmora",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "oxlint",
-    "preview": "vite preview"
-  },
+  "main": "electron/main.js",
+ "scripts": {
+  "dev": "vite",
+  "build": "tsc -b && vite build",
+  "lint": "oxlint",
+  "preview": "vite preview",
+  "electron": "electron .",
+  "package:win": "npm run build && electron-builder --win"
+},
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -26,10 +31,27 @@
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
     "autoprefixer": "^10.6.1",
+    "electron": "44.5.1",
+    "electron-builder": "^26.15.3",
     "oxlint": "^1.81.0",
     "postcss": "^8.5.28",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
+  },
+"build": {
+  "appId": "com.nexmora.admin",
+  "productName": "Nexmora Admin",
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/**/*",
+    "package.json"
+  ],
+  "win": {
+    "target": "nsis"
   }
+}
 }

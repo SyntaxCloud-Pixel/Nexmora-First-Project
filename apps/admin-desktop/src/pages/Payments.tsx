@@ -1,21 +1,113 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from 'supabase-client';
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Button, Badge, Spinner, useToast } from '../components/ui';
-import { Search, Plus, MoreVertical, DollarSign, Calendar } from 'lucide-react';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Button, Badge, Spinner, useToast, Dialog, DialogHeader, DialogTitle, DialogContent, DialogFooter } from '../components/ui';
+import { Search, Plus, MoreVertical, DollarSign, Calendar, Eye, CheckCircle2, XCircle, RotateCcw } from 'lucide-react';
 
 interface Payment {
   id: string;
   payment_date: string;
+  due_date: string | null;
   amount: number;
   payment_method: string;
   payment_status: string;
+  reference_number: string | null;
+  notes: string | null;
+  created_at: string;
   customer?: { customer_name: string };
 }
 
+// --- Dropdown Menu Component (local, no extra dependency) ---
+interface ActionMenuProps {
+  payment: Payment;
+  onViewDetails: (payment: Payment) => void;
+  onUpdateStatus: (paymentId: string, status: string) => void;
+}
+
+const ActionMenu: React.FC<ActionMenuProps> = ({ payment, onViewDetails, onUpdateStatus }) => {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setOpen(prev => !prev)}
+        aria-label="Payment actions"
+      >
+        <MoreVertical className="h-4 w-4" />
+      </Button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-1 w-48 rounded-md border bg-white shadow-lg z-50 py-1 animate-in fade-in">
+          {/* View Details */}
+          <button
+            className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+            onClick={() => { onViewDetails(payment); setOpen(false); }}
+          >
+            <Eye className="h-4 w-4 text-gray-500" />
+            View Details
+          </button>
+
+          {/* Divider */}
+          <div className="my-1 border-t border-gray-100" />
+
+          {/* Mark as Completed — show for PENDING or FAILED */}
+          {(payment.payment_status === 'PENDING' || payment.payment_status === 'FAILED') && (
+            <button
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors"
+              onClick={() => { onUpdateStatus(payment.id, 'COMPLETED'); setOpen(false); }}
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              Mark as Completed
+            </button>
+          )}
+
+          {/* Mark as Refunded — show for COMPLETED */}
+          {payment.payment_status === 'COMPLETED' && (
+            <button
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-amber-700 hover:bg-amber-50 transition-colors"
+              onClick={() => { onUpdateStatus(payment.id, 'REFUNDED'); setOpen(false); }}
+            >
+              <RotateCcw className="h-4 w-4" />
+              Mark as Refunded
+            </button>
+          )}
+
+          {/* Mark as Failed — show for PENDING */}
+          {payment.payment_status === 'PENDING' && (
+            <button
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors"
+              onClick={() => { onUpdateStatus(payment.id, 'FAILED'); setOpen(false); }}
+            >
+              <XCircle className="h-4 w-4" />
+              Mark as Failed
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// --- Main Component ---
 export const Payments: React.FC = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [detailPayment, setDetailPayment] = useState<Payment | null>(null);
   const { showToast } = useToast();
 
   const fetchPayments = async () => {
@@ -47,6 +139,24 @@ export const Payments: React.FC = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  const handleUpdateStatus = async (paymentId: string, newStatus: string) => {
+    const { error } = await supabase
+      .from('payments')
+      .update({ payment_status: newStatus })
+      .eq('id', paymentId);
+
+    if (error) {
+      console.error('Error updating payment status:', error);
+      showToast('Failed to update payment status', 'error');
+    } else {
+      showToast(`Payment marked as ${newStatus.toLowerCase()}`, 'success');
+      // Realtime will pick it up, but update locally for instant feedback
+      setPayments(prev =>
+        prev.map(p => p.id === paymentId ? { ...p, payment_status: newStatus } : p)
+      );
+    }
+  };
 
   const filteredPayments = payments.filter(p => 
     p.customer?.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -147,9 +257,11 @@ export const Payments: React.FC = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="sm" title="View details">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
+                        <ActionMenu
+                          payment={payment}
+                          onViewDetails={setDetailPayment}
+                          onUpdateStatus={handleUpdateStatus}
+                        />
                       </div>
                     </TableCell>
                   </TableRow>
@@ -171,6 +283,69 @@ export const Payments: React.FC = () => {
           </Button>
         )}
       </div>
+
+      {/* Payment Details Dialog */}
+      <Dialog open={!!detailPayment} onOpenChange={() => setDetailPayment(null)}>
+        <DialogHeader>
+          <DialogTitle>Payment Details</DialogTitle>
+        </DialogHeader>
+        <DialogContent>
+          {detailPayment && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Customer</p>
+                  <p className="font-medium">{detailPayment.customer?.customer_name || 'Unknown'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Amount</p>
+                  <p className="font-semibold text-green-600">${detailPayment.amount.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Payment Date</p>
+                  <p className="font-medium">{new Date(detailPayment.payment_date).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Due Date</p>
+                  <p className="font-medium">{detailPayment.due_date ? new Date(detailPayment.due_date).toLocaleDateString() : '—'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Payment Method</p>
+                  <Badge variant="secondary">{detailPayment.payment_method}</Badge>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Status</p>
+                  <Badge
+                    variant={
+                      detailPayment.payment_status === 'COMPLETED' ? 'success' :
+                      detailPayment.payment_status === 'PENDING' ? 'warning' :
+                      'destructive'
+                    }
+                  >
+                    {detailPayment.payment_status}
+                  </Badge>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-500">Reference Number</p>
+                  <p className="font-medium font-mono">{detailPayment.reference_number || '—'}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-500">Notes</p>
+                  <p className="font-medium text-gray-700">{detailPayment.notes || 'No notes'}</p>
+                </div>
+              </div>
+              <div className="text-xs text-gray-400 pt-2 border-t">
+                Created {new Date(detailPayment.created_at).toLocaleString()}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setDetailPayment(null)}>
+            Close
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </div>
   );
 };
