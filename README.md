@@ -195,5 +195,3 @@ For technical support, contact:
   - Real-time updates
 
 ---
-
-**Built with ❤️ using modern web technologies**
