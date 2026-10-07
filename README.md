@@ -1,8 +1,8 @@
-# 🏢 Nexmora Management System
+# Nexmora Management System
 
 A comprehensive Employee & Customer Management System built with modern web technologies.
 
-## 🌟 Features
+## Features
 
 ### Admin Desktop Application
 - **Employee Management**: Add, edit, and manage staff accounts
@@ -18,7 +18,7 @@ A comprehensive Employee & Customer Management System built with modern web tech
 - **Profile Management**: Update personal information
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **React 19** - UI Framework
@@ -38,7 +38,7 @@ A comprehensive Employee & Customer Management System built with modern web tech
 - **Electron** - Desktop application framework
 - **electron-builder** - Application packaging
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 nexmora-monorepo/
@@ -64,7 +64,7 @@ nexmora-monorepo/
 └── package.json                # Root package.json
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js 18+ 
@@ -110,7 +110,7 @@ npm run dev:portal
 npm run dev:admin
 ```
 
-## 🏗️ Building for Production
+## Building for Production
 
 ### Employee Portal
 ```bash
@@ -125,7 +125,7 @@ npm run build
 npm run build:electron  # Creates desktop installers
 ```
 
-## 🔐 Security Features
+## Security Features
 
 - **Role-Based Access Control (RBAC)**: Admin, Employee roles
 - **Row Level Security (RLS)**: Database-level access control
@@ -133,7 +133,7 @@ npm run build:electron  # Creates desktop installers
 - **Audit Logging**: Complete activity tracking
 - **Edge Functions**: Secure server-side operations
 
-## 📊 Database Schema
+## Database Schema
 
 The system uses Supabase with the following main tables:
 - `profiles` - User profiles and employee data
@@ -143,7 +143,7 @@ The system uses Supabase with the following main tables:
 - `audit_logs` - System activity logs
 - `roles` - User roles and permissions
 
-## 🌐 Deployment
+## Deployment
 
 ### Employee Portal
 Deployed to [Vercel/Netlify] - [URL]
@@ -151,7 +151,7 @@ Deployed to [Vercel/Netlify] - [URL]
 ### Admin Desktop
 Available as downloadable installers - [Release URL]
 
-## 📝 Development Scripts
+## Development Scripts
 
 ```bash
 # Development
@@ -167,25 +167,17 @@ npm run lint:admin     # Lint admin desktop
 npm run lint:portal    # Lint employee portal
 ```
 
-## 🤝 Contributing
-
-This is a client project. For internal development:
-1. Create a feature branch
-2. Make your changes
-3. Test thoroughly
-4. Submit pull request
-
-## 📄 License
+## License
 
 Proprietary - Client confidential
 
-## 👥 Support
+##  Support
 
 For technical support, contact:
-- Email: [YOUR_EMAIL]
-- Phone: [YOUR_PHONE]
+- Email: [sytheee9@gmail.com]
+- Phone: [+92 341 2632219]
 
-## 🔄 Version History
+##  Version History
 
 - **v1.0.0** - Initial release with core features
   - Employee and Customer management
